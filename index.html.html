@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>帮王伟买票 · Giúp 王伟 đặt vé 12306</title>
+<style>
+  :root{
+    --cream:#FDF6EC;
+    --warm-bg:#F9EDD8;
+    --orange:#E8883A;
+    --dark-org:#C06A1A;
+    --brown:#5C3D1E;
+    --brown-lt:#8B6340;
+    --sage:#8DAF8A;
+    --sage-lt:#D6E8D3;
+    --sage-dk:#5A8057;
+    --card-line:#E8C99A;
+    --light-box:#FEF5E7;
+    --gray-txt:#9B8270;
+    --rail-red:#C0392B;
+    --rail-red-dk:#992D22;
+    --ok:#5A8057;
+    --bad:#C0392B;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%; margin:0;}
+  body{
+    font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--cream); color:var(--brown);
+    display:flex; flex-direction:column; overflow:hidden;
+    padding:12px 20px 14px;
+  }
+  .wrap{flex:1; min-height:0; display:flex; flex-direction:column; max-width:1180px; width:100%; margin:0 auto;}
+
+  /* ── Header ───────────────────────────── */
+  .lesson-header{text-align:center; flex-shrink:0; margin-bottom:8px; transition:.2s;}
+  .eyebrow{
+    display:inline-block; background:var(--orange); color:#fff; font-weight:700;
+    font-size:11px; letter-spacing:.05em; padding:3px 14px; border-radius:20px; margin-bottom:5px;
+  }
+  h1{margin:2px 0 2px; font-size:21px; color:var(--dark-org); font-family:"Trebuchet MS",sans-serif;}
+  .sub{color:var(--brown-lt); font-size:12.5px; margin:0;}
+  /* Khi vào bài — chỉ giữ 1 dòng tiêu đề để nhường chỗ cho nội dung */
+  .lesson-header.compact{margin-bottom:6px;}
+  .lesson-header.compact .eyebrow,
+  .lesson-header.compact .sub{display:none;}
+  .lesson-header.compact h1{font-size:16px; margin:0;}
+
+  /* ── Progress bar ─────────────────────── */
+  .progress-row{display:flex; align-items:center; gap:10px; margin:8px 0 10px; flex-shrink:0;}
+  .progress-track{flex:1; height:8px; background:var(--warm-bg); border-radius:6px; overflow:hidden; border:1px solid var(--card-line);}
+  .progress-fill{height:100%; background:linear-gradient(90deg,var(--orange),var(--rail-red)); width:0%; transition:width .4s ease;}
+  .progress-label{font-size:12px; font-weight:700; color:var(--dark-org); white-space:nowrap;}
+
+  /* ── Main grid ────────────────────────── */
+  .stage{flex:1; min-height:0; display:grid; grid-template-columns:270px 1fr; gap:18px;}
+  @media(max-width:800px){.stage{grid-template-columns:1fr; overflow-y:auto;}}
+
+  /* ── Phone mockup ─────────────────────── */
+  .phone{
+    background:#1c1c1c; border-radius:28px; padding:8px; box-shadow:0 14px 30px rgba(92,61,30,.22);
+    min-height:0; display:flex;
+  }
+  .phone-screen{
+    background:#fff; border-radius:20px; overflow:hidden; flex:1; display:flex; flex-direction:column; min-height:0;
+  }
+  .status-bar{background:#111; color:#eee; font-size:10px; padding:5px 14px; display:flex; justify-content:space-between; flex-shrink:0;}
+  .app-bar{
+    background:linear-gradient(135deg,var(--rail-red),var(--rail-red-dk)); color:#fff; padding:9px 12px;
+    font-weight:700; font-size:13px; display:flex; align-items:center; gap:7px; flex-shrink:0;
+  }
+  .app-bar .dot{width:7px;height:7px;border-radius:50%;background:#FFD966;}
+  .app-body{padding:12px; font-size:12px; flex:1; background:#fafafa; overflow-y:auto; min-height:0;}
+  .task-note{
+    background:#EAF3E9; border:1px solid var(--sage); color:var(--sage-dk); font-size:10.5px;
+    border-radius:8px; padding:6px 9px; margin-bottom:9px; font-weight:700;
+  }
+  .field{
+    background:#fff; border:1px solid #e6e0d8; border-radius:9px; padding:8px 10px; margin-bottom:8px;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .field .lbl{color:#9b8f80; font-size:10px;}
+  .field .val{font-weight:700; color:#2b2b2b; font-size:13px;}
+  .row2{display:flex; gap:7px;}
+  .row2 .field{flex:1;}
+  .btn-primary{
+    width:100%; background:var(--rail-red); color:#fff; border:none; border-radius:9px; padding:9px;
+    font-weight:700; font-size:12.5px; margin-top:4px; cursor:default;
+  }
+  .chip{
+    display:inline-block; background:#FDEDEA; color:var(--rail-red); font-size:10px; font-weight:700;
+    padding:3px 8px; border-radius:12px; margin:2px 3px 0 0;
+  }
+  .chip.on{background:var(--rail-red); color:#fff;}
+  .notice-banner{
+    background:#FFF3CD; border:1px solid #FFE28A; color:#7a5b00; font-size:11px; border-radius:8px;
+    padding:7px 9px; margin-bottom:8px;
+  }
+  .ticket-card{
+    border:1.5px dashed var(--rail-red); border-radius:10px; padding:10px; background:#fff8f7; text-align:center;
+  }
+  .ticket-card .route{font-size:14px; font-weight:800; color:var(--rail-red);}
+  .step-tag{position:absolute; top:6px; right:12px; font-size:9.5px; color:#bbb; z-index:2;}
+
+  /* ── NPC + quiz panel ─────────────────── */
+  .panel{
+    background:#fff; border:1px solid var(--card-line); border-radius:16px; padding:16px 18px;
+    display:flex; flex-direction:column; min-height:0; overflow-y:auto;
+  }
+  .branch-tag{font-size:10.5px; font-weight:700; padding:3px 9px; border-radius:12px; align-self:flex-start;}
+  .branch-tag.main{background:var(--warm-bg); color:var(--dark-org);}
+  .branch-tag.rebook{background:#FDEDEA; color:var(--rail-red);}
+  .branch-tag.delay{background:#FFF3CD; color:#8a6600;}
+
+  .npc-row{display:flex; gap:11px; align-items:flex-start; margin:10px 0 12px; flex-shrink:0;}
+  .avatar{
+    width:46px; height:46px; border-radius:50%; background:var(--sage-lt); border:2px solid var(--sage);
+    display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0;
+  }
+  .npc-name{font-weight:800; color:var(--sage-dk); font-size:12.5px; margin-bottom:3px;}
+  .npc-name .role{color:var(--brown-lt); font-weight:400;}
+  .npc-bubble{
+    background:var(--sage-lt); border:1px solid var(--sage); border-radius:14px 14px 14px 4px; padding:10px 12px; flex:1;
+  }
+  .listen-btn{
+    background:var(--orange); color:#fff; border:none; border-radius:18px; padding:7px 15px; font-size:12.5px;
+    font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:5px; box-shadow:0 3px 0 var(--dark-org);
+  }
+  .listen-btn:active{transform:translateY(2px); box-shadow:none;}
+  .listen-btn.replay{background:var(--sage-dk); box-shadow:0 3px 0 #3f5c3d;}
+  .listen-count{font-size:10.5px; color:var(--brown-lt); margin-left:6px;}
+
+  .transcript{
+    display:none; margin-top:9px; background:var(--light-box); border:1px solid var(--card-line); border-radius:9px; padding:9px 11px;
+  }
+  .transcript.show{display:block;}
+  .transcript .zh{font-family:Georgia,serif; font-weight:700; font-size:14px; color:var(--brown);}
+  .transcript .py{font-style:italic; color:var(--gray-txt); font-size:11px; margin-top:2px;}
+  .transcript .vn{color:var(--dark-org); font-size:11px; margin-top:2px;}
+
+  .quiz-box{flex:1; min-height:0; display:flex; flex-direction:column;}
+  .quiz-q-zh{font-weight:700; font-size:14.5px; color:var(--brown); font-family:Georgia,serif;}
+  .quiz-q-vn{font-size:11.5px; color:var(--brown-lt); font-style:italic; margin:2px 0 10px;}
+  .opts{display:flex; flex-direction:column; gap:7px;}
+  .opt{
+    text-align:left; padding:9px 12px; border-radius:9px; border:1.5px solid var(--card-line); background:var(--light-box);
+    font-size:13.5px; cursor:pointer; font-family:Georgia,serif; color:var(--brown); transition:.15s;
+  }
+  .opt:hover{border-color:var(--orange);}
+  .opt.correct{background:var(--sage-lt); border-color:var(--sage-dk); color:var(--sage-dk); font-weight:700;}
+  .opt.wrong{background:#FBE4E1; border-color:var(--bad); color:var(--bad); font-weight:700;}
+  .opt[disabled]{cursor:default;}
+
+  .feedback{margin-top:9px; font-size:12.5px; font-weight:700; display:none;}
+  .feedback.show{display:block;}
+  .feedback.ok{color:var(--sage-dk);}
+  .feedback.bad{color:var(--bad);}
+
+  .nav-row{margin-top:12px; display:flex; justify-content:space-between; align-items:center; flex-shrink:0;}
+  .hint-txt{font-size:11px;color:var(--brown-lt); max-width:60%;}
+  .next-btn{
+    background:var(--dark-org); color:#fff; border:none; border-radius:20px; padding:9px 20px; font-size:13px;
+    font-weight:700; cursor:pointer; opacity:.4; pointer-events:none; transition:.2s;
+  }
+  .next-btn.ready{opacity:1; pointer-events:auto;}
+
+  /* ── Intro screen ─────────────────────── */
+  .intro-screen{
+    flex:1; min-height:0; display:none; flex-direction:column; align-items:center; justify-content:center;
+    background:#fff; border:1px solid var(--card-line); border-radius:18px; padding:26px; text-align:center;
+  }
+  .intro-screen.show{display:flex;}
+  .intro-avatar{
+    width:78px; height:78px; border-radius:50%; background:var(--sage-lt); border:3px solid var(--sage);
+    display:flex; align-items:center; justify-content:center; font-size:38px; margin-bottom:12px;
+  }
+  .intro-name{font-weight:800; color:var(--sage-dk); font-size:15px; margin-bottom:10px;}
+  .intro-bubble{
+    background:var(--sage-lt); border:1px solid var(--sage); border-radius:16px; padding:16px 20px; max-width:560px;
+  }
+  .intro-bubble .zh{font-family:Georgia,serif; font-weight:700; font-size:17px; color:var(--brown);}
+  .intro-bubble .py{font-style:italic; color:var(--gray-txt); font-size:12.5px; margin-top:6px;}
+  .intro-bubble .vn{color:var(--dark-org); font-size:12.5px; margin-top:6px;}
+  .intro-actions{margin-top:18px; display:flex; gap:12px;}
+  .intro-task{
+    margin-top:16px; background:var(--warm-bg); border:1px solid var(--card-line); border-radius:10px;
+    padding:9px 16px; font-size:12px; color:var(--dark-org); font-weight:700; max-width:560px;
+  }
+  .start-btn{
+    background:var(--rail-red); color:#fff; border:none; border-radius:22px; padding:11px 26px; font-size:14px;
+    font-weight:700; cursor:pointer;
+  }
+
+  /* ── Summary screen ───────────────────── */
+  .summary{display:none; flex:1; min-height:0; overflow-y:auto; text-align:center; padding:20px 10px;}
+  .summary.show{display:block;}
+  .summary .score{font-size:38px; font-weight:800; color:var(--dark-org);}
+  .summary p{color:var(--brown-lt); font-size:13px;}
+  .review-list{text-align:left; margin-top:14px; max-width:700px; margin-left:auto; margin-right:auto;}
+  .review-item{border-bottom:1px solid var(--card-line); padding:8px 0;}
+  .review-item .zh{font-family:Georgia,serif; font-weight:700; color:var(--brown); font-size:13px;}
+  .review-item .py{font-style:italic; color:var(--gray-txt); font-size:11px;}
+  .review-item .vn{color:var(--dark-org); font-size:11px;}
+  .restart-btn{
+    margin-top:14px; background:var(--orange); color:#fff; border:none; border-radius:22px; padding:10px 24px;
+    font-weight:700; font-size:13px; cursor:pointer;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="lesson-header" id="lessonHeader">
+    <span class="eyebrow">CHỦ ĐỀ 11 · PHẦN 2 · LUYỆN NGHE & GIAO TIẾP</span>
+    <h1>🚄 帮王伟买票 · Giúp 王伟 đặt vé trên 12306</h1>
+    <p class="sub">王伟 nhờ bạn đặt vé giúp — nghe kỹ từng lời nhắn rồi chọn đúng thao tác trên app.</p>
+  </div>
+
+  <div class="progress-row" id="progressRow" style="display:none;">
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-label" id="progressLabel">Bước 1 / 10</div>
+  </div>
+
+  <!-- Intro story screen -->
+  <div class="intro-screen show" id="introScreen">
+    <div class="intro-avatar">🧑‍✈️</div>
+    <div class="intro-name">王伟</div>
+    <div class="intro-bubble">
+      <div class="zh" id="introZh"></div>
+      <div class="py" id="introPy"></div>
+      <div class="vn" id="introVn"></div>
+    </div>
+    <div class="intro-task">📱 Nhiệm vụ của bạn: nghe 王伟 nói rồi thao tác đúng trên app 12306 để đặt vé giúp anh ấy!</div>
+    <div class="intro-actions">
+      <button class="listen-btn" onclick="app.playIntro()">🔊 Nghe lời nhắn</button>
+      <button class="start-btn" onclick="app.startStory()">开始帮忙 · Bắt đầu giúp 王伟 🚄</button>
+    </div>
+  </div>
+
+  <div class="stage" id="stage" style="display:none;">
+    <!-- Phone mockup -->
+    <div class="phone">
+      <div class="phone-screen" style="position:relative;">
+        <span class="step-tag" id="stepTag">1/10</span>
+        <div class="status-bar"><span>9:41</span><span>🔋100%</span></div>
+        <div class="app-bar"><span class="dot"></span> 铁路 12306</div>
+        <div class="app-body" id="appBody"><!-- injected --></div>
+      </div>
+    </div>
+
+    <!-- NPC + quiz panel -->
+    <div class="panel" id="panel">
+      <span class="branch-tag main" id="branchTag">主线 · Đặt vé cơ bản</span>
+      <div class="npc-row">
+        <div class="avatar">🧑‍✈️</div>
+        <div class="npc-bubble">
+          <div class="npc-name">王伟 <span class="role">· nhờ bạn giúp</span></div>
+          <button class="listen-btn" id="listenBtn" onclick="app.playAudio()">🔊 Nghe</button>
+          <span class="listen-count" id="listenCount"></span>
+          <div class="transcript" id="transcript"></div>
+        </div>
+      </div>
+
+      <div class="quiz-box">
+        <div>
+          <div class="quiz-q-zh" id="quizQZh"></div>
+          <div class="quiz-q-vn" id="quizQVn"></div>
+        </div>
+        <div class="opts" id="quizOpts"></div>
+        <div class="feedback" id="feedback"></div>
+      </div>
+
+      <div class="nav-row">
+        <div class="hint-txt">💡 Có thể bấm nghe lại nhiều lần trước khi chọn.</div>
+        <button class="next-btn" id="nextBtn" onclick="app.next()">继续 · Tiếp tục →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <div class="panel summary" id="summary">
+    <div>🎉</div>
+    <div class="score" id="scoreText">0/10</div>
+    <p>câu trả lời đúng ngay lần nghe đầu tiên — cảm ơn bạn đã giúp 王伟 đặt vé thành công!</p>
+    <div class="review-list" id="reviewList"></div>
+    <button class="restart-btn" onclick="app.restart()">🔁 Làm lại từ đầu</button>
+  </div>
+
+</div>
+
+<script>
+(function(){
+
+// ══════════════════════════════════════════════════════════
+// INTRO
+// ══════════════════════════════════════════════════════════
+const INTRO = {
+  zh:'你好！我下星期要去西安旅游，能麻烦你帮我在12306上买张票吗？谢谢你啦！',
+  py:"Nǐ hǎo! Wǒ xià xīngqī yào qù Xī'ān lǚyóu, néng máfan nǐ bāng wǒ zài yāo'èr sānlíngliù shàng mǎi zhāng piào ma? Xièxie nǐ la!",
+  vn:'Chào cậu! Tuần sau tớ đi Tây An du lịch, phiền cậu giúp tớ đặt một vé trên 12306 được không? Cảm ơn cậu nhiều nhé!'
+};
+
+// ══════════════════════════════════════════════════════════
+// DATA — 10 bước: 6 bước đặt vé chính + 2 bước 改签 + 2 bước 晚点
+// Câu hỏi & đáp án 100% tiếng Trung, kèm nghĩa tiếng Việt bên dưới câu hỏi.
+// qType: 'listen' = hiểu nội dung 王伟 vừa nói | 'action' = chọn thao tác tiếp theo
+// ══════════════════════════════════════════════════════════
+const STEPS = [
+  {
+    branch:'main', qType:'listen',
+    zh:'你好！我下星期要去西安旅游，你能帮我在12306上买票吗？我从北京出发。',
+    py:"Nǐ hǎo! Wǒ xià xīngqī yào qù Xī'ān lǚyóu, nǐ néng bāng wǒ zài 12306 shàng mǎi piào ma? Wǒ cóng Běijīng chūfā.",
+    vn:'Chào cậu! Tuần sau tớ đi Tây An du lịch, cậu giúp tớ đặt vé trên 12306 được không? Tớ xuất phát từ Bắc Kinh.',
+    qZh:'王伟要从哪个城市出发，去哪个城市？',
+    qVn:'(王伟 xuất phát từ thành phố nào, đến thành phố nào?)',
+    opts:['上海 → 广州','北京 → 西安','北京 → 上海','西安 → 北京'],
+    correct:1,
+    screen:{ task:'任务：帮王伟选择出发站和到达站', html:`
+        <div class="field"><span class="lbl">出发站</span><span class="val">北京</span></div>
+        <div class="field"><span class="lbl">到达站</span><span class="val">西安</span></div>
+        <button class="btn-primary">查询车票</button>` }
+  },
+  {
+    branch:'main', qType:'action',
+    zh:'我想选六月二十号出发，坐高铁的话大概要五个小时。',
+    py:'Wǒ xiǎng xuǎn liù yuè èrshí hào chūfā, zuò gāotiě dehuà dàgài yào wǔ gè xiǎoshí.',
+    vn:'Tớ muốn chọn ngày 20 tháng 6 khởi hành, đi tàu cao tốc thì khoảng mất năm tiếng.',
+    qZh:'根据王伟的话，你接下来应该在app上做什么？',
+    qVn:'(Theo lời 王伟, tiếp theo bạn nên làm gì trên app?)',
+    opts:['选择座位类型','选择出发日期和车次','填写护照号码','选择支付方式'],
+    correct:1,
+    screen:{ task:'任务：选择出发日期与车次', html:`
+        <div class="row2">
+          <div class="field"><span class="lbl">日期</span><span class="val">6月20日</span></div>
+          <div class="field"><span class="lbl">车次</span><span class="val">G87</span></div>
+        </div>
+        <div class="field"><span class="lbl">时长</span><span class="val">约5小时</span></div>
+        <button class="btn-primary">下一步</button>` }
+  },
+  {
+    branch:'main', qType:'listen',
+    zh:'我想坐二等座，五号车厢靠窗的位置最好。',
+    py:'Wǒ xiǎng zuò èrděng zuò, wǔ hào chēxiāng kào chuāng de wèizhi zuì hǎo.',
+    vn:'Tớ muốn ngồi hạng hai, tốt nhất là chỗ cạnh cửa sổ ở toa số năm.',
+    qZh:'王伟希望坐哪种座位？',
+    qVn:'(王伟 muốn ngồi loại ghế nào?)',
+    opts:['二等座','一等座','商务座','无座'],
+    correct:0,
+    screen:{ task:'任务：为王伟选座位', html:`
+        <div style="margin-bottom:7px;">
+          <span class="chip on">二等座 ✓</span><span class="chip">一等座</span><span class="chip">商务座</span>
+        </div>
+        <div class="field"><span class="lbl">车厢</span><span class="val">5号车厢</span></div>
+        <div class="field"><span class="lbl">座位</span><span class="val">靠窗 12B</span></div>
+        <button class="btn-primary">确认座位</button>` }
+  },
+  {
+    branch:'main', qType:'action',
+    zh:'对了，别忘了填我的护照号，因为火车票是实名制的。',
+    py:'Duìle, bié wàngle tián wǒ de hùzhàohào, yīnwèi huǒchēpiào shì shímíngzhì de.',
+    vn:'À đúng rồi, đừng quên điền số hộ chiếu của tớ, vì vé tàu là chế độ thực danh.',
+    qZh:'根据王伟的话，你接下来要做什么？',
+    qVn:'(Theo lời 王伟, tiếp theo bạn cần làm gì?)',
+    opts:['选择座位','填写护照号码','确认支付','打印车票'],
+    correct:1,
+    screen:{ task:'任务：填写实名信息', html:`
+        <div class="field"><span class="lbl">姓名</span><span class="val">王伟</span></div>
+        <div class="field"><span class="lbl">护照号</span><span class="val">B123••••</span></div>
+        <div class="notice-banner">⚠️ 实名制：请确保信息与护照一致</div>
+        <button class="btn-primary">提交信息</button>` }
+  },
+  {
+    branch:'main', qType:'listen',
+    zh:'钱的事你别担心，我用支付宝转给你，或者你直接用我的微信支付。',
+    py:'Qián de shì nǐ bié dānxīn, wǒ yòng Zhīfùbǎo zhuǎn gěi nǐ, huòzhě nǐ zhíjiē yòng wǒ de Wēixìn zhīfù.',
+    vn:'Chuyện tiền cậu đừng lo, tớ chuyển khoản qua Alipay cho cậu, hoặc cậu dùng luôn WeChat Pay của tớ.',
+    qZh:'王伟提到了哪两种支付方式？',
+    qVn:'(王伟 nhắc đến hai phương thức thanh toán nào?)',
+    opts:['现金和信用卡','银行卡和现金','支付宝和微信支付','只有支付宝'],
+    correct:2,
+    screen:{ task:'任务：确认支付方式', html:`
+        <div class="field"><span class="lbl">车票</span><span class="val">¥ 553.5</span></div>
+        <div class="row2">
+          <div class="field"><span class="val">💙 支付宝</span></div>
+          <div class="field"><span class="val">💚 微信支付</span></div>
+        </div>
+        <button class="btn-primary">确认支付</button>` }
+  },
+  {
+    branch:'main', qType:'action',
+    zh:'买好以后，记得告诉我车次和座位号，谢谢你！',
+    py:'Mǎi hǎo yǐhòu, jìde gàosù wǒ chēcì hé zuòwèi hào, xièxie nǐ!',
+    vn:'Mua xong rồi nhớ báo cho tớ mã chuyến và số ghế nhé, cảm ơn cậu!',
+    qZh:'购票成功后，你应该做什么？',
+    qVn:'(Sau khi mua vé thành công, bạn nên làm gì?)',
+    opts:['取消订单','申请退票','把车次和座位号告诉王伟','换一个车次'],
+    correct:2,
+    screen:{ task:'任务：购票成功，通知王伟', html:`
+        <div class="ticket-card">
+          <div class="route">北京 → 西安</div>
+          <div style="font-size:11px;color:#777;margin:4px 0;">G87 · 5号车厢 12B · 二等座</div>
+          <div class="chip on">电子客票</div>
+        </div>` }
+  },
+
+  // ── BRANCH: 改签 đổi vé ──────────────────────────────────
+  {
+    branch:'rebook', qType:'listen',
+    zh:'哎呀，不好意思，我那天可能有事去不了，能不能帮我改签？',
+    py:'Āiyā, bùhǎoyìsi, wǒ nà tiān kěnéng yǒushì qù bùliǎo, néng bu néng bāng wǒ gǎiqiān?',
+    vn:'Ối, xin lỗi cậu, hôm đó tớ có thể bận việc không đi được, giúp tớ đổi vé được không?',
+    qZh:'王伟遇到了什么情况？',
+    qVn:'(王伟 gặp phải tình huống gì?)',
+    opts:['票丢了，想补办','那天有事，想改签','行李超重，想托运','坐错车次，想退票'],
+    correct:1,
+    screen:{ task:'⚠️ 任务：行程有变，申请改签', html:`
+        <div class="notice-banner">📱 通知：王伟的行程需要调整</div>
+        <div class="ticket-card">
+          <div class="route">北京 → 西安</div>
+          <div style="font-size:11px;color:#777;">G87 · 6月20日</div>
+        </div>
+        <button class="btn-primary">申请改签</button>` }
+  },
+  {
+    branch:'rebook', qType:'action',
+    zh:'在app上申请改签要收一点儿手续费，你帮我换成别的车次就行。',
+    py:'Zài app shàng shēnqǐng gǎiqiān yào shōu yìdiǎnr shǒuxùfèi, nǐ bāng wǒ huànchéng bié de chēcì jiù xíng.',
+    vn:'Đổi vé trên app sẽ mất một chút phí thủ tục, cậu giúp tớ đổi sang chuyến khác là được.',
+    qZh:'你接下来应该在app上做什么操作？',
+    qVn:'(Tiếp theo bạn nên thao tác gì trên app?)',
+    opts:['申请退票','重新买一张新票','申请改签，换成别的车次','取消整个行程'],
+    correct:2,
+    screen:{ task:'任务：完成改签', html:`
+        <div class="field"><span class="lbl">新车次</span><span class="val">G95</span></div>
+        <div class="field"><span class="lbl">手续费</span><span class="val">¥ 20</span></div>
+        <div class="chip on">改签成功</div>` }
+  },
+
+  // ── BRANCH: 晚点 tàu trễ ─────────────────────────────────
+  {
+    branch:'delay', qType:'listen',
+    zh:'车站广播说，因为天气不好，我们这趟车晚点半个小时。',
+    py:'Chēzhàn guǎngbō shuō, yīnwèi tiānqì bù hǎo, wǒmen zhè tàng chē wǎndiǎn bàn gè xiǎoshí.',
+    vn:'Loa ở ga thông báo, vì thời tiết không tốt, chuyến tàu này của bọn tớ bị trễ nửa tiếng.',
+    qZh:'根据广播，火车为什么晚点，晚点多长时间？',
+    qVn:'(Theo thông báo, vì sao tàu trễ, trễ bao lâu?)',
+    opts:['因为设备故障，晚点一个小时','因为乘客太多，晚点十五分钟','因为天气不好，取消了','因为天气不好，晚点半个小时'],
+    correct:3,
+    screen:{ task:'📢 任务：查看车站广播', html:`
+        <div class="notice-banner">⏰ G87 次列车 晚点 30 分钟</div>
+        <div class="field"><span class="lbl">原发车</span><span class="val">14:00</span></div>
+        <div class="field"><span class="lbl">预计发车</span><span class="val">14:30</span></div>` }
+  },
+  {
+    branch:'delay', qType:'action',
+    zh:'请大家在候车室稍等，广播会通知检票时间和站台号。',
+    py:'Qǐng dàjiā zài hòuchēshì shāo děng, guǎngbō huì tōngzhī jiǎnpiào shíjiān hé zhàntái hào.',
+    vn:'Mời mọi người chờ một chút ở phòng chờ, loa sẽ thông báo giờ soát vé và số sân ga.',
+    qZh:'根据工作人员的话，王伟接下来应该怎么做？',
+    qVn:'(Theo lời nhân viên, tiếp theo王伟 nên làm gì?)',
+    opts:['马上去检票口排队','去退票窗口办手续','先在候车室等广播通知','去问登机口在哪儿'],
+    correct:2,
+    screen:{ task:'✅ 任务：准备登车', html:`
+        <div class="field"><span class="lbl">候车室</span><span class="val">3号候车室</span></div>
+        <div class="field"><span class="lbl">检票口</span><span class="val">待通知</span></div>
+        <div class="chip on">请留意广播</div>` }
+  },
+];
+
+const BRANCH_LABEL = {
+  main:  {cls:'main',   text:'主线 · Đặt vé cơ bản'},
+  rebook:{cls:'rebook', text:'支线 · 改签 (Đổi vé)'},
+  delay: {cls:'delay',  text:'支线 · 晚点 (Tàu trễ)'}
+};
+
+// ══════════════════════════════════════════════════════════
+// STATE + LOGIC
+// ══════════════════════════════════════════════════════════
+let idx = 0;
+let listenCounts = new Array(STEPS.length).fill(0);
+let answered = new Array(STEPS.length).fill(false);
+let firstTryCorrect = new Array(STEPS.length).fill(false);
+
+function pickChineseVoice(){
+  const voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+  return voices.find(v => /zh|Chinese|Mandarin/i.test(v.lang) || /zh|Chinese|Mandarin/i.test(v.name)) || null;
+}
+
+function speak(text){
+  if(!('speechSynthesis' in window)){
+    alert('Trình duyệt này chưa hỗ trợ đọc giọng tiếng Trung. Hãy dùng Chrome/Edge mới nhất.');
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'zh-CN';
+  utter.rate = 0.92;
+  const v = pickChineseVoice();
+  if(v) utter.voice = v;
+  window.speechSynthesis.speak(utter);
+}
+
+function renderStep(){
+  const step = STEPS[idx];
+  const total = STEPS.length;
+
+  document.getElementById('progressFill').style.width = ((idx)/total*100)+'%';
+  document.getElementById('progressLabel').textContent = `Bước ${idx+1} / ${total}`;
+  document.getElementById('stepTag').textContent = `${idx+1}/${total}`;
+
+  const bl = BRANCH_LABEL[step.branch];
+  const bt = document.getElementById('branchTag');
+  bt.className = 'branch-tag ' + bl.cls;
+  bt.textContent = bl.text;
+
+  document.getElementById('appBody').innerHTML =
+    `<div class="task-note">${step.screen.task}</div>` + step.screen.html;
+
+  document.getElementById('transcript').classList.remove('show');
+  document.getElementById('transcript').innerHTML = `
+      <div class="zh">${step.zh}</div>
+      <div class="py">${step.py}</div>
+      <div class="vn">${step.vn}</div>`;
+  document.getElementById('listenCount').textContent = '';
+  document.getElementById('listenBtn').textContent = '🔊 Nghe';
+  document.getElementById('listenBtn').classList.remove('replay');
+
+  document.getElementById('quizQZh').textContent = step.qZh;
+  document.getElementById('quizQVn').textContent = step.qVn;
+  const optsBox = document.getElementById('quizOpts');
+  optsBox.innerHTML = '';
+  step.opts.forEach((opt,i)=>{
+    const b = document.createElement('button');
+    b.className = 'opt';
+    b.textContent = opt;
+    b.onclick = ()=>app.answer(i);
+    optsBox.appendChild(b);
+  });
+
+  document.getElementById('feedback').className = 'feedback';
+  document.getElementById('feedback').textContent = '';
+  document.getElementById('nextBtn').className = 'next-btn';
+
+  answered[idx] = false;
+}
+
+const app = {
+  playIntro(){ speak(INTRO.zh); },
+  startStory(){
+    document.getElementById('introScreen').classList.remove('show');
+    document.getElementById('stage').style.display = 'grid';
+    document.getElementById('progressRow').style.display = 'flex';
+    document.getElementById('lessonHeader').classList.add('compact');
+    renderStep();
+  },
+  playAudio(){
+    const step = STEPS[idx];
+    listenCounts[idx]++;
+    document.getElementById('listenCount').textContent = 'đã nghe: ' + listenCounts[idx] + ' lần';
+    document.getElementById('listenBtn').textContent = '🔊 Nghe lại';
+    document.getElementById('listenBtn').classList.add('replay');
+    speak(step.zh);
+  },
+  answer(i){
+    if(answered[idx]) return;
+    const step = STEPS[idx];
+    const opts = document.querySelectorAll('#quizOpts .opt');
+    opts.forEach(o=>o.setAttribute('disabled','true'));
+    const fb = document.getElementById('feedback');
+
+    if(i === step.correct){
+      opts[i].classList.add('correct');
+      fb.textContent = '✅ 对了！Chính xác,王伟 cảm ơn bạn!';
+      fb.className = 'feedback show ok';
+      if(listenCounts[idx] <= 1) firstTryCorrect[idx] = true;
+    } else {
+      opts[i].classList.add('wrong');
+      opts[step.correct].classList.add('correct');
+      fb.textContent = '❌ 不对哦 — đáp án đúng đã tô xanh. Nghe lại nếu cần rồi tiếp tục.';
+      fb.className = 'feedback show bad';
+    }
+    answered[idx] = true;
+    document.getElementById('transcript').classList.add('show');
+    document.getElementById('nextBtn').classList.add('ready');
+  },
+  next(){
+    if(!answered[idx]) return;
+    if(idx < STEPS.length - 1){
+      idx++;
+      renderStep();
+    } else {
+      showSummary();
+    }
+  },
+  restart(){
+    idx = 0;
+    listenCounts = new Array(STEPS.length).fill(0);
+    answered = new Array(STEPS.length).fill(false);
+    firstTryCorrect = new Array(STEPS.length).fill(false);
+    document.getElementById('summary').classList.remove('show');
+    document.getElementById('introScreen').classList.add('show');
+    document.getElementById('stage').style.display = 'none';
+    document.getElementById('progressRow').style.display = 'none';
+    document.getElementById('lessonHeader').classList.remove('compact');
+  }
+};
+window.app = app;
+
+function showSummary(){
+  document.getElementById('stage').style.display = 'none';
+  document.getElementById('progressRow').style.display = 'none';
+
+  const score = firstTryCorrect.filter(Boolean).length;
+  document.getElementById('scoreText').textContent = score + '/' + STEPS.length;
+
+  const list = document.getElementById('reviewList');
+  list.innerHTML = '';
+  STEPS.forEach((s,i)=>{
+    const div = document.createElement('div');
+    div.className = 'review-item';
+    div.innerHTML = `<div class="zh">${i+1}. ${s.zh}</div><div class="py">${s.py}</div><div class="vn">${s.vn}</div>`;
+    list.appendChild(div);
+  });
+
+  document.getElementById('summary').classList.add('show');
+}
+
+document.getElementById('introZh').textContent = INTRO.zh;
+document.getElementById('introPy').textContent = INTRO.py;
+document.getElementById('introVn').textContent = INTRO.vn;
+
+if('speechSynthesis' in window){
+  window.speechSynthesis.onvoiceschanged = ()=>{};
+}
+})();
+</script>
+</body>
+</html>
